@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<!-- Metro 4 -->
+<link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
+</head>
+<body>
+<br><br>
+<H1 class="grid offset-4">Donate To Campaign</H1>
+<div class="grid offset-1">
+<form method="post" id="target">
+    <div class="form-group">
+        <label for="title">Campaign Name</label>
+        <input class="form-control" id="title"
+               placeholder="Enter campaign name">
+    </div>
+    <div class="form-group">
+        <label for="amount">Amount</label>
+        <input class="form-control" id="amount" type="number" min="1"
+               placeholder="Enter a positive amount for donation">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+</div>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<script src="{{url_for('static', filename='contract.js')}}"></script>
+<script>
+
+
+function handleDonateToCampaign() {
+
+    const title = $("#title").val();
+    const amount = parseInt($("#amount").val());
+
+    console.log('running handleDonateToCampaign')
+
+    const data = {
+        campaign_name: title
+    };
+
+    // TODO: need to handle what if campaign not exist
+    axios.post("{{ url_for('get_campaign_address_by_name') }}", data)
+        .then(function (response) {
+            console.log('response post: ', response);
+            return handleDonateToCampaignSendToChain(response.data.campaign_id, amount);
+        }).then(function (campaignId) {
+            return window.web3.eth.getBalance(campaignId);
+        }).then(balance => {
+            console.log('balance returned: ', balance);
+            alert("Donation received, great success! campaign new total balance: " + balance);
+            window.location = "{{ url_for('index') }}";
+        })
+        .catch(e => {
+            alert("problem:" + e);
+            window.location = "{{ url_for('index') }}"
+        });
+}
+
+function handleDonateToCampaignSendToChain(campaignId, donation) {
+    // user chooses from a drop down manu that shows the names of each campaign, how much it needs and the goal.
+    // when he chooses a name, I get here the address to the campaign he has chosen.
+    // campaignContractAddress
+    console.log("campaign_id:", campaignId, ", donation:", donation);
+    let contract = new window.web3.eth.Contract(abi, campaignId);
+    console.log("window.deployAccount:", window.deployAccount);
+    return contract.methods.contribute().send({
+        from: window.deployAccount,
+        value: donation
+    }).then((contributeRes) => {
+
+        console.log('donation1 res: ', contributeRes);
+        console.log('donation2 res: ', contributeRes.events);
+        let eventInfo = null;
+        if(contributeRes.events.FundingReceived !== undefined) {
+            console.log('donation3 FundingReceived');
+            eventInfo = contributeRes.events.FundingReceived;
+        } else if(contributeRes.events.FundingRejected !== undefined) {
+            console.log('donation3 FundingRejected');
+            eventInfo = contributeRes.events.FundingRejected;
+        } else {
+            return campaignId;
+        }
+        console.log('donation3 res: ', eventInfo);
+        console.log('donation3 returnValues.contributor: ', eventInfo.returnValues.contributor);
+        console.log('donation3 returnValues.amount: ', eventInfo.returnValues.amount);
+        console.log('donation3 returnValues.currentTotal: ', eventInfo.returnValues.currentTotal);
+        return campaignId;
+      });
+}
+
+$( "#target" ).submit(function( event ) {
+    event.preventDefault();
+    handleDonateToCampaign();
+});
+
+</script>
+</body>
+</html>

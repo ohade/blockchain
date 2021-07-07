@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<!-- Metro 4 -->
+<link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
+</head>
+<body>
+<br><br>
+<H1 class="grid offset-4">Key Generator</H1>
+<div class="grid offset-1">
+<form method="post" id="target">
+    <div class="form-group">
+        <label for="privateKey">Private key</label>
+        <input class="form-control" id="privateKey"
+               placeholder="Enter account private key">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+<div id="result"></div>
+</div>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+<script>
+
+window.addEventListener('load', async () => {
+    if (window.ethereum) {
+        window.web3 = new Web3(ethereum);
+    }
+    else if (window.web3) {
+        window.web3 = new Web3(web3.currentProvider);
+    }
+});
+
+function signConstantMessage() {
+    const message = "WITHDRAW!";
+// privateKey1 & privateKey2 are provided by the user in a specific field:
+//     let privateKey1 = "181ae9f7b98a628d1e1fbda6a8534f2d0a1c117907219965038e7248cef71a24";
+//     let privateKey2 = "2550c4d11beb73bbe185bbebb2464efcc2e90423d7fb0698f9ed1082f631fb56";
+    let privateKey = $("#privateKey").val();
+
+    const signature = window.web3.eth.accounts.sign(message, privateKey);
+    console.log("signature:", signature);
+    let v = signature.v;
+    let r = signature.r;
+    let s = signature.s;
+
+    $("#result").html("<br><br>v: "+v+"<br>r: "+r+"<br>s:"+s);
+    console.log("v: "+v+", r: "+r+", s:"+s);
+}
+
+$( "#target" ).submit(function( event ) {
+    event.preventDefault();
+    signConstantMessage();
+});
+</script>
+</body>
+</html>

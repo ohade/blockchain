@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<!-- Metro 4 -->
+<link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
+</head>
+<body>
+<br><br>
+<div class="card">
+  <div class="card-header">
+    Campaigns
+  </div>
+</div>
+<div id="insertHere"></div>
+
+<!--  <div class="card-body">-->
+<!--    <h5 class="card-title">title</h5>-->
+<!--    <p class="card-text">address</p>-->
+<!--    <p class="card-text">deadline</p>-->
+<!--    <p class="card-text">currentState</p>-->
+<!--    <p class="card-text">currentAmount</p>-->
+<!--    <p class="card-text">goalAmount</p>-->
+<!--  </div>-->
+<!--          Fundraising,-->
+<!--        Expired,-->
+<!--        Successful,-->
+<!--        SuccessfulAndWithdrawn-->
+<!--  // deadline: "1625518744", currentState: "0", currentAmount: "0", goalAmount: "1000"-->
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<script src="{{url_for('static', filename='contract.js')}}"></script>
+<script>
+
+window.addEventListener('load', async () => {
+    // Modern dapp browsers...
+    if (window.ethereum) {
+        window.web3 = new Web3(ethereum);
+    }
+    // Legacy dapp browsers...
+    else if (window.web3) {
+        window.web3 = new Web3(web3.currentProvider);
+        // Acccounts always exposed
+        // web3.eth.sendTransaction({/* ... */});
+    }
+    // Non-dapp browsers...
+    else {
+        console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+    }
+
+    // this is done when starting the application
+    try {
+        // Request account access if needed
+        await ethereum.enable();
+        // Accounts now exposed, use them
+        window.web3.eth.getAccounts().then((accounts) => {
+          console.log('accounts: ', accounts[0]);
+          window.deployAccount = accounts[0];
+          handleViewAllCampaigns();
+        });
+    } catch (error) {
+        // User denied account access...
+    }
+});
+
+function handleViewAllCampaigns() {
+    console.log('running handleWithdrawFromCampaign');
+
+    axios.post("{{ url_for('view_all_campaign') }}")
+        .then(function (response) {
+            console.log('response post: ', response);
+
+            response.data.results.forEach(function (campaign, i) {
+               handleGetCampaignDetails(campaign);
+            });
+        })
+        .catch(console.log);
+}
+
+var state_dict = {
+  "0" : "Fundraising",
+  "1" : "Expired",
+  "2" : "Successful",
+  "3" : "SuccessfulAndWithdrawn"
+};
+
+function handleGetCampaignDetails(campaign) {
+    let campaignId = campaign.address;
+    console.log("campaign_id:", campaignId);
+    let myContract = new window.web3.eth.Contract(abi, campaignId);
+
+    // window.web3.eth.getBalance(campaignId).then(balance => {
+    //         console.log('balance before: ', balance)
+    // });
+    // console.log('my accounts: ', window.deployAccount)
+    myContract.methods.updateDetails().send({from: window.deployAccount})
+            .then(res => {
+              return myContract.methods.getDetails().call();
+            }).then(res => {
+              console.log('donation returned: ', res);
+              $( "#insertHere" ).append("      " +
+                "<div class=\"card\">" +
+                "    <div className=\"card-body\">\n" +
+                "        <dl>" +
+                "        <dt >Name</dt>\n" +
+                "        <dd >"+campaign.title+"</dd>\n" +
+                "        <dt >address</dt>\n" +
+                "        <dd >"+campaign.address+"</dd>\n" +
+                "        <dt >Deadline</dt>\n" +
+                "        <dd >"+new Date(parseInt(res.deadline)*1000)+"</dd>\n" +
+                "        <dt >Campaign Status (one of four possible states: Fundraising, Expired, Successful, SuccessfulAndWithdrawn)</dt>\n" +
+                "        <dd >"+state_dict[res.currentState]+"</dd>\n" +
+                "        <dt >Raised So Far</dt>\n" +
+                "        <dd >"+res.currentAmount+"</dd>\n" +
+                "        <dt >Goal</dt>\n" +
+                "        <dd >"+res.goalAmount+"</dd>\n" +
+                "        </dl>" +
+                "    </div>" +
+                "</div>");
+            });
+}
+
+// $( "#target" ).submit(function( event ) {
+//     event.preventDefault();
+//     handleGetAllCampaigns();
+//   });
+</script>
+</body>
+</html>

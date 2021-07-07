@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- Metro 4 -->
+    <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
+    <style>
+        a { text-decoration: none; }
+    </style>
+  </head>
+  <body>
+  <br>  <br>  <br>  <br>
+<div class="grid offset-5">
+    <div class="row">
+        <div class="cell">
+            <div class="row">
+                <a href="{{ url_for('view_all_campaign') }}" style="color:white; text-decoration: none"><div data-role="tile" class="bg-red" data-size="wide">
+                    <br>
+                    <h3 class="grid offset-1">View All Campaign</h3>
+                </div></a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="grid offset-5">
+    <div class="row">
+        <div class="cell">
+            <div class="row">
+                <a href="{{ url_for('new_campaign') }}" style="color:white; text-decoration: none"><div data-role="tile" class="bg-indigo" data-size="wide">
+                    <br>
+                    <h3 class="grid offset-1">New Campaign</h3>
+                </div></a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="grid offset-5">
+    <div class="row">
+        <div class="cell">
+            <div class="row">
+                <a href="{{ url_for('donate') }}" style="color:white; text-decoration: none"><div data-role="tile" class="bg-blue" data-size="wide" >
+                    <br>
+                    <h3 class="grid offset-1">Donate</h3>
+                </div></a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="grid offset-5">
+    <div class="row">
+        <div class="cell">
+            <div class="row">
+                <a href="{{ url_for('refund') }}" style="color:white; text-decoration: none"><div data-role="tile" class="bg-green" data-size="wide">
+                    <br>
+                    <h3 class="grid offset-1">Refund</h3>
+                </div></a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="grid offset-5">
+    <div class="row">
+        <div class="cell">
+            <div class="row">
+                <a href="{{ url_for('withdraw') }}" style="color:white; text-decoration: none"><div data-role="tile" class="bg-orange" data-size="wide">
+                    <br>
+                    <h3 class="grid offset-1">Withdraw</h3>
+                </div></a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="grid offset-5">
+    <div class="row">
+        <div class="cell">
+            <div class="row">
+                <a href="{{ url_for('generate_keys') }}" style="color:white; text-decoration: none"><div data-role="tile" class="bg-black" data-size="wide">
+                    <br>
+                    <h3 class="grid offset-1">Generate Keys</h3>
+                </div></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Metro 4 -->
+    <script src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script>
+  </body>
+</html>
+

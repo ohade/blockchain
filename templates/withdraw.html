@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<!-- Metro 4 -->
+<link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
+</head>
+<body>
+<br><br>
+<H1 class="grid offset-4">Withdraw Ended Campaign</H1>
+<div class="grid offset-1">
+<form method="post" id="target">
+    <div class="form-group">
+        <label for="title">Campaign Name</label>
+        <input class="form-control" id="title"
+               placeholder="Enter campaign name">
+    </div>
+    <br>
+    <label>Owner 1 - V,R,S</label>
+    <div class="form-group">
+        <label for="v1">Enter v</label>
+        <input class="form-control" id="v1"
+               placeholder="Enter r of first account">
+    </div>
+    <div class="form-group">
+        <label for="r1">Enter r</label>
+        <input class="form-control" id="r1"
+               placeholder="Enter s of first account">
+    </div>
+    <div class="form-group">
+        <label for="s1">Enter s</label>
+        <input class="form-control" id="s1"
+               placeholder="Enter v of first account">
+    </div>
+    <br>
+    <label>Owner 2 - V,R,S</label>
+    <div class="form-group">
+        <label for="v2">Enter v</label>
+        <input class="form-control" id="v2"
+               placeholder="Enter v of second account">
+    </div>
+    <div class="form-group">
+        <label for="r2">Enter r</label>
+        <input class="form-control" id="r2"
+               placeholder="Enter r of second account">
+    </div>
+    <div class="form-group">
+        <label for="s2">Enter s</label>
+        <input class="form-control" id="s2"
+               placeholder="Enter s of second account">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+</div>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<script src="{{url_for('static', filename='contract.js')}}"></script>
+</body>
+<script>
+
+
+function handleWithdrawFromCampaign() {
+    console.log('running handleWithdrawFromCampaign');
+
+    const title = $("#title").val();
+
+    const v1 = $("#v1").val();
+    const r1 = $("#r1").val();
+    const s1 = $("#s1").val();
+
+    const v2 = $("#v2").val();
+    const r2 = $("#r2").val();
+    const s2 = $("#s2").val();
+
+    const vs = [v1, v2];
+    const rs = [r1, r2];
+    const ss = [s1, s2];
+
+    const data = {
+        campaign_name: title
+    };
+
+    // TODO: need to handle what if campaign not exist
+    axios.post("{{ url_for('get_campaign_address_by_name') }}", data)
+        .then(function (response) {
+            console.log('response post: ', response);
+            return handleWithdrawFromCampaignSendToChain(response.data.campaign_id, vs, rs, ss);
+        }).then(function (campaignId) {
+            return window.web3.eth.getBalance(campaignId);
+        }).then(balance => {
+            console.log('campaign balance after: ', balance);
+            alert("withdraw was a success, new campaign total balance: " + balance);
+            window.location = "{{ url_for('index') }}";
+        }).catch(e => {
+            alert("problem:" + e);
+            window.location = "{{ url_for('index') }}"
+        });
+}
+
+function handleWithdrawFromCampaignSendToChain(campaignId, vs, rs, ss) {
+    let myContract = new window.web3.eth.Contract(abi, campaignId);
+    console.log('withdraw now', campaignId);
+
+    const message = "WITHDRAW!";
+    const messageHash= window.web3.eth.accounts.hashMessage(message);
+
+    console.log('accounts: ', window.deployAccount);
+    return myContract.methods.withdrawFunds(messageHash, vs, rs, ss).send({
+        from: window.deployAccount
+    }).then((fundsRes) => {
+        console.log('donation returned: ', fundsRes);
+        return campaignId;
+    });
+}
+
+$( "#target" ).submit(function( event ) {
+    event.preventDefault();
+    handleWithdrawFromCampaign();
+});
+</script>
+</html>
