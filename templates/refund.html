@@ -1,24 +1,24 @@
 <!doctype html>
 <html>
 <head>
-<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-<!-- Metro 4 -->
-<link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- Metro 4 -->
+    <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
 </head>
 <body>
 <br><br>
 <H1 class="grid offset-4">Refund From Campaign</H1>
 <div class="grid offset-1">
-<form method="post" id="target">
-    <div class="form-group">
-        <label for="title">Campaign Name</label>
-        <input class="form-control" id="title"
-               placeholder="Enter campaign name">
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+    <form method="post" id="target">
+        <div class="form-group">
+            <label for="title">Campaign Name</label>
+            <input class="form-control" id="title"
+                   placeholder="Enter campaign name">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
 </div>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
@@ -32,56 +32,77 @@
         crossorigin="anonymous"></script>
 <script src="{{url_for('static', filename='contract.js')}}"></script>
 <script>
+    async function checkCampaignExist(campaign_title) {
+        const response = await axios.post("{{ url_for('view_all_campaign') }}");
 
-
-function handleGetRefundFromCampaign() {
-    console.log('running handleWithdrawFromCampaign');
-
-    const title = $("#title").val();
-    const data = {
-        campaign_name: title
-    };
-
-    // TODO: need to handle what if campaign not exist
-    axios.post("{{ url_for('get_campaign_address_by_name') }}", data)
-        .then(function (response) {
-            console.log('response post: ', response);
-            return handleGetRefundFromCampaignSendToChain(response.data.campaign_id);
-        }).then(function (campaignId) {
-            return window.web3.eth.getBalance(campaignId);
-        }).then(balance => {
-            console.log('balance after: ', balance);
-            alert("refund was a success, new campaign total balance: " + balance);
-            window.location = "{{ url_for('index') }}";
-        }).catch(e => {
-            alert("problem:" + e);
-            window.location = "{{ url_for('index') }}";
+        let campaign_found = false;
+        response.data.results.forEach(function (campaign, i) {
+            if (campaign.title === campaign_title) {
+                campaign_found = true;
+            }
         });
-}
 
-function handleGetRefundFromCampaignSendToChain(campaignId) {
-    console.log("campaign_id:", campaignId);
-    let contract = new window.web3.eth.Contract(abi, campaignId);
+        return campaign_found;
+    }
 
-    return window.web3.eth.getBalance(campaignId)
-        .then(balance => {
-            console.log('balance before: ', balance);
-            console.log('accounts: ', window.deployAccount);
+    async function handleGetRefundFromCampaign() {
+        console.log('running handleWithdrawFromCampaign');
 
-            return contract.methods.getRefund().send({
-                from: window.deployAccount
-            })
-        }).then((refundRes) => {
-            console.log('donation returned: ', refundRes);
-            alert(refundRes);
-            return campaignId;
+        const title = $("#title").val();
+
+        const campaign_exist = await checkCampaignExist(title);
+
+        if (campaign_exist === false) {
+            alert("campaign with that name doesn't exist, please choose a different name");
+        } else {
+
+            const data = {
+                campaign_name: title
+            };
+
+            // TODO: need to handle what if campaign not exist
+            axios.post("{{ url_for('get_campaign_address_by_name') }}", data)
+                .then(function (response) {
+                    console.log('response post: ', response);
+                    return handleGetRefundFromCampaignSendToChain(response.data.campaign_id);
+                }).then(function (campaignId) {
+                return window.web3.eth.getBalance(campaignId);
+            }).then(balance => {
+                console.log('balance after: ', balance);
+                alert("refund was a success, new campaign total balance: " + balance);
+                window.location = "{{ url_for('index') }}";
+            }).catch(e => {
+                alert("problem:" + e);
+                window.location = "{{ url_for('index') }}";
+            });
+        }
+    }
+
+    function handleGetRefundFromCampaignSendToChain(campaignId) {
+        console.log("campaign_id:", campaignId);
+        let contract = new window.web3.eth.Contract(abi, campaignId);
+
+        return window.web3.eth.getBalance(campaignId)
+            .then(balance => {
+                console.log('balance before: ', balance);
+                console.log('accounts: ', window.deployAccount);
+
+                return contract.methods.getRefund().send({
+                    from: window.deployAccount
+                })
+            }).then((refundRes) => {
+                console.log('donation returned: ', refundRes);
+                alert(refundRes);
+                return campaignId;
+            });
+    }
+
+    $("#target").submit(function (event) {
+        event.preventDefault();
+        handleGetRefundFromCampaign().catch(e => {
+            console.log('There has been a problem with your fetch operation: ' + e.message);
         });
-}
-
-$( "#target" ).submit(function( event ) {
-    event.preventDefault();
-    handleGetRefundFromCampaign();
-  });
+    });
 </script>
 </body>
 </html>
