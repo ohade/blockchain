@@ -4,14 +4,18 @@
 
 1. Install [MetaMask chrome extension](https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en).
 2. Open MetaMask and setup a connection to IDC telnet server. use below images for assistant.
+
 ![meta1](./images/metamask.png)
 ![meta2](./images/metamask2.png)
+
 2. `git clone https://Daniel.Meller@vcs.ap.idc.ac.il/blockchain/project/201639663_038198149_finalProject`
 3. `cd blockchain`
 4. `docker build -t blockchain:v0.0.1 .`
 5. `docker run -p 80:80 blockchain:v0.0.1`
 6. In the browser, simply type `localhost`. you should see the following screen:
+
 ![meta3](./images/mainapp.png)
+
 <br><br>
 
 <h2><b>Your options:</b></h2>
@@ -30,12 +34,15 @@ If the action ended good or bad.
 You will be asked to confirm a small amount of gas to be used for each of the campaigns the servers holds.
 The operation may take up to a minute. 
 In the end you should see all the contracts and their status, as can be seen in the image below:<br>
+
 ![meta4](./images/view_all_campaigns.png)
+
 <br><br>
 <h4><b>2. New Campaign:</b></h4>
 Enter a campaign name, 3 accounts of "campaign owners", goal to achieve and amount of days it should be active 
 and press "submit".
 The operation may take up to a minute. 
+
 ![meta5](./images/new_campaign.png)
 
 <br><br>
@@ -43,6 +50,7 @@ The operation may take up to a minute.
 This screen is for someone who wants to become a campaign contributors.
 Enter campaign you want to donate to, enter amount and press "submit".
 The operation may take up to a minute. 
+
 ![meta6](./images/donate.png)
 
 <br><br>
@@ -50,13 +58,15 @@ The operation may take up to a minute.
 This screen is for campaign contributors who want to get their money back.
 Enter campaign you want to get your money back from.
 The operation may take up to a minute. 
+
 ![meta7](./images/refund.png)
 
 <br><br>
 <h4><b>5. Withdraw:</b></h4>
 This screen is for campaign owners who want to withdraw the funds from the campaign. 
 When a campaign finished successfully.
-The operation may take up to a minute. 
+The operation may take up to a minute.
+
 ![meta8](./images/withdraw.png)
 
 <br><br>
@@ -75,7 +85,9 @@ this screen.
 <br><br><br>
 <h2><b>How It Works:</b></h2>
 Below you can see a design diagram of the all system.
+
 ![design](./images/design.png)
+
 When you Click "New Campaign", fill the details and press submit. you are first going through a validation
 process to make sure that the campaign name you chose is a unique one.
 It's important because, using that name people will know to contribute to your campaign.
