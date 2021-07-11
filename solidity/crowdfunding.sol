@@ -40,11 +40,6 @@ contract CrowdfundingProject {
         require(state == State.Expired);
         _;
     }
-    // Modifier to check if the function caller is the project creator
-//    modifier isCreator() {
-//        require(msg.sender == creator);
-//        _;
-//    }
 
     constructor
     (
@@ -65,7 +60,6 @@ contract CrowdfundingProject {
     /** @dev Function to fund a certain project.
       */
     function contribute() external payable {
-//        require(!isOwner(msg.sender));
         if(inStateOfActiveCampaign() == true) {
             contributions[msg.sender] += msg.value;
             currentBalance += msg.value;

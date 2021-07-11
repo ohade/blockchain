@@ -14,6 +14,9 @@ class Campaign(db.Model):
         return f'<Campaign title:{self.title} address:{self.address}>'
 
 
+db.create_all()
+
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -88,7 +91,7 @@ if __name__ == "__main__":
     db.create_all()
     all_campaign = Campaign.query.all()
     # Campaign.query.delete()
-    db.session.commit()
+    # db.session.commit()
     print(len(all_campaign))
     for c in all_campaign:
         print(c)

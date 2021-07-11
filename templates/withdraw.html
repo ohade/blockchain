@@ -128,7 +128,7 @@
         let myContract = new window.web3.eth.Contract(abi, campaignId);
         console.log('withdraw now', campaignId);
 
-        const message = "WITHDRAW!";
+        const message = "fixed phrase";
         const messageHash = window.web3.eth.accounts.hashMessage(message);
 
         console.log('accounts: ', window.deployAccount);
