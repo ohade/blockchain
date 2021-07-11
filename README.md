@@ -1,4 +1,4 @@
-<h1>Crowdfunding Platforms</h1>
+<h1>Crowdfunding Platform</h1>
 <p>Blockchain Course, Final Project</p><br><br>
 <h2>Installation and running:</h2>
 
@@ -11,7 +11,7 @@
 4. `docker build -t blockchain:v0.0.1 .`
 5. `docker run -p 80:80 blockchain:v0.0.1`
 6. In the browser, simply type `localhost`. you should see the following screen:
-![meta1](./images/mainapp.png)
+![meta3](./images/mainapp.png)
 <br><br>
 
 <h2><b>Your options:</b></h2>
@@ -30,34 +30,34 @@ If the action ended good or bad.
 You will be asked to confirm a small amount of gas to be used for each of the campaigns the servers holds.
 The operation may take up to a minute. 
 In the end you should see all the contracts and their status, as can be seen in the image below:<br>
-![meta1](./images/view_all_campaigns.png)
+![meta4](./images/view_all_campaigns.png)
 <br><br>
 <h4><b>2. New Campaign:</b></h4>
 Enter a campaign name, 3 accounts of "campaign owners", goal to achieve and amount of days it should be active 
 and press "submit".
 The operation may take up to a minute. 
-![meta1](./images/new_campaign.png)
+![meta5](./images/new_campaign.png)
 
 <br><br>
 <h4><b>3. Donate:</b></h4>
 This screen is for someone who wants to become a campaign contributors.
 Enter campaign you want to donate to, enter amount and press "submit".
 The operation may take up to a minute. 
-![meta1](./images/donate.png)
+![meta6](./images/donate.png)
 
 <br><br>
 <h4><b>4. Refund:</b></h4>
 This screen is for campaign contributors who want to get their money back.
 Enter campaign you want to get your money back from.
 The operation may take up to a minute. 
-![meta1](./images/refund.png)
+![meta7](./images/refund.png)
 
 <br><br>
 <h4><b>5. Withdraw:</b></h4>
 This screen is for campaign owners who want to withdraw the funds from the campaign. 
 When a campaign finished successfully.
 The operation may take up to a minute. 
-![meta1](./images/withdraw.png)
+![meta8](./images/withdraw.png)
 
 <br><br>
 <h4><b>6. Generate Keys:</b></h4>
@@ -69,8 +69,8 @@ The fixed phrase is: "fixed phrase"
 
 Below you can see images of where to get the private key, and how it looks when you use it in
 this screen.
-![meta1](./images/privatekey.png)
-![meta1](./images/key_gen.png)
+![meta9](./images/privatekey.png)
+![meta10](./images/key_gen.png)
 
 <br><br><br>
 <h2><b>How It Works:</b></h2>
